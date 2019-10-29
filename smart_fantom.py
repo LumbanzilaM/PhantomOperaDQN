@@ -50,6 +50,8 @@ class Player:
 
         dic = {u.CHAR_SELECT: EnvManagers.CharacterEnvManager(),
                u.POS_SELECT: EnvManagers.PositionEnvManager()}
+        dic[u.CHAR_SELECT].dqnAgent.load_model("tmp_models/character_picker.h5")
+        dic[u.POS_SELECT].dqnAgent.load_model("tmp_models/position_picker.h5")
         return dic
 
     def connect(self):
@@ -80,34 +82,30 @@ class Player:
         elif question == u.RESET:
             for key, envManager in self.envManagers.items():
                 envManager.process_env(data)
-                envManager.append_sample(True)
-                print("last carlotta position = ", envManager.carlotta_pos)
-                print("last suspect nbr = ", envManager.suspect_nbr)
-                # self.dqnAgent.replay(32)
                 envManager.reset()
-                envManager.dqnAgent.update_greedy()
             print("RESET ------------------------------------------------------------------------------ RESET")
             return 0
         else:
+            print("Game state", data[u.GAME_STATE])
             envManager = self.envManagers[question]
             envManager.previous_env = self.last_env
             envManager.process_env(data)
             if not envManager.isFirstAction:
-                envManager.append_sample(False)
+                envManager.append_sample(self.end)
                 envManager.dqnAgent.train_model()
                 print("carlotta position = ", envManager.carlotta_pos)
                 print("suspect nbr = ", envManager.suspect_nbr)
                 print("reward = ", envManager.reward)
-            envManager.get_action(np.array(envManager.env[1]))
-            while not envManager.validate_answer():
-                print("learning {} ...".format(question))
-                envManager.process_env(data)
-                envManager.wrong_answer()
-                envManager.append_sample(False)
-                envManager.get_action(np.array(envManager.env[1]))
+            envManager.get_action(np.array(envManager.env[1]), True)
+
             self.last_env = envManager
             response = envManager.dqn2server_answer(data["data"])
+            if not envManager.validate_answer():
+                print("EPIC FAIL")
+                response = 0
+            print("response = ", response)
             print("Answer to chose from", data["data"])
+
             print("Answer chose", data["data"][response])
             return response
 

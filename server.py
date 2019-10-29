@@ -543,10 +543,14 @@ class Game:
         logger.info(f"---- exit : {self.exit}")
         logger.info(
             f"---- final score : {self.exit-self.position_carlotta}\n----------")
-        question = {"question type": "Reset",
-                    "data": [0, 0],
-                    "game state": self.game_state}
         for player in self.players:
+            data = -100
+            if (self.winner == 0 and player.role == "fantom") or (self.winner == 1 and player.role == "inspector"):
+                data = 1000
+            self.update_game_state(player.role)
+            question = {"question type": "Reset",
+                        "data": [data, self.exit-self.position_carlotta],
+                        "game state": self.game_state}
             ask_question_json(player, question)
         return self.exit - self.position_carlotta
 
@@ -613,11 +617,11 @@ pr.enable()
 stat = [0, 0]
 last_stat = [0 , 0]
 
-for i in range(500):
+for i in range(1000):
     game = Game(players)
     game.lancer()
     stat[game.winner] += 1
-    if i > 400:
+    if i > 900:
         last_stat[game.winner] += 1
     print("i =", i)
 

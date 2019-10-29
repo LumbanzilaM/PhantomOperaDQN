@@ -4,6 +4,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 import collections
 import random
+from keras.models import load_model
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -21,9 +22,9 @@ class DQNAgent:
         self.batch_size = 64
         self.train_start = 32
         self.round_count = 0
-        self.total_round = 500
+        self.total_round = 1000
         # create replay memory using deque
-        self.memory = collections.deque(maxlen=2000)
+        self.memory = collections.deque(maxlen=10000)
 
         # create main model and target model
         self.model = self.build_model()
@@ -70,6 +71,13 @@ class DQNAgent:
 
         # save sample <s,a,r,s'> to the replay memory
 
+    def get_smart_action(self, state):
+        q_value = self.model.predict(np.reshape(state, (1, self.state_size)))
+        print("smart plus ", q_value)
+        return np.argmax(q_value[0])
+
+    def load_model(self, path):
+        self.model = load_model(path)
 
     def append_sample(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))
