@@ -546,7 +546,7 @@ class Game:
         for player in self.players:
             data = -100
             if (self.winner == 0 and player.role == "fantom") or (self.winner == 1 and player.role == "inspector"):
-                data = 1000
+                data = 100
             self.update_game_state(player.role)
             question = {"question type": "Reset",
                         "data": [data, self.exit-self.position_carlotta],

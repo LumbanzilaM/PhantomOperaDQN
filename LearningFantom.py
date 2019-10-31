@@ -48,8 +48,8 @@ class Player:
 
     def init_dictionnary(self):
 
-        dic = {u.CHAR_SELECT: EnvManagers.CharacterEnvManager(),
-               u.POS_SELECT: EnvManagers.PositionEnvManager()}
+        dic = {u.CHAR_SELECT: EnvManagers.CharacterEnvManagerV2(),
+               u.POS_SELECT: EnvManagers.PositionEnvManagerV2()}
         return dic
 
     def connect(self):
@@ -76,7 +76,9 @@ class Player:
         question = data[u.QUESTION]
         print("question = ", question)
         if question != u.CHAR_SELECT and question != u.POS_SELECT and question != u.RESET:
-            return 0
+            print("Answer to chose from", data["data"])
+            print("Answer chose", data["data"][0])
+            return 1
         elif question == u.RESET:
             for key, envManager in self.envManagers.items():
                 envManager.process_env(data)
@@ -99,12 +101,6 @@ class Player:
                 print("suspect nbr = ", envManager.suspect_nbr)
                 print("reward = ", envManager.reward)
             envManager.get_action(np.array(envManager.env[1]))
-            while not envManager.validate_answer():
-                print("learning {} ...".format(question))
-                envManager.process_env(data)
-                envManager.wrong_answer()
-                envManager.append_sample(False)
-                envManager.get_action(np.array(envManager.env[1]))
             self.last_env = envManager
             response = envManager.dqn2server_answer(data["data"])
             print("Answer to chose from", data["data"])
