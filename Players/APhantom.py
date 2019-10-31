@@ -6,12 +6,9 @@ import json
 import protocol
 import numpy as np
 import random
-from DQNAgents import DQNAgent
-import EnvManagers
 import utils as u
-from collections import namedtuple
+import EnvManager.Phantom as phantomManager
 
-characters = ['pink', 'blue', 'brown', 'red', 'black', 'white', 'purple', 'grey']
 host = "localhost"
 port = 12000
 # HEADERSIZE = 10
@@ -36,7 +33,7 @@ stream_handler.setLevel(logging.WARNING)
 fantom_logger.addHandler(stream_handler)
 
 
-class Player:
+class Phantom:
     def __init__(self):
         self.end = False
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,8 +45,8 @@ class Player:
 
     def init_dictionnary(self):
 
-        dic = {u.CHAR_SELECT: EnvManagers.CharacterEnvManager(),
-               u.POS_SELECT: EnvManagers.PositionEnvManager()}
+        dic = {
+               u.POS_SELECT: phantomManager.PositionEnvManager()}
         return dic
 
     def connect(self):
@@ -75,40 +72,20 @@ class Player:
     def smart_answer(self, data):
         question = data[u.QUESTION]
         print("question = ", question)
-        if question != u.CHAR_SELECT and question != u.POS_SELECT and question != u.RESET:
-            print("Answer to chose from", data["data"])
-            print("Answer chose", data["data"][0])
-            return 0
-        elif question == u.RESET:
-            for key, envManager in self.envManagers.items():
-                envManager.process_env(data)
-                envManager.append_sample(True)
-                # print("last carlotta position = ", envManager.carlotta_pos)
-                # print("last suspect nbr = ", envManager.suspect_nbr)
-                # self.dqnAgent.replay(32)
-                envManager.reset()
-                envManager.dqnAgent.update_greedy()
+        if question == u.RESET:
+            self.last_env.game_end(data)
+            self.last_env = None
             print("RESET ------------------------------------------------------------------------------ RESET")
             return 0
+        elif question not in self.envManagers:
+            return 0
         else:
-            envManager = self.envManagers[question]
-            envManager.previous_env = self.last_env
-            envManager.process_env(data)
-            if not envManager.isFirstAction:
-                envManager.append_sample(False)
-                envManager.dqnAgent.train_model()
-                # print("carlotta position = ", envManager.carlotta_pos)
-                # print("suspect nbr = ", envManager.suspect_nbr)
-                # print("reward = ", envManager.reward)
-            envManager.get_action(np.array(envManager.env[1]))
-            while not envManager.validate_answer():
-                #print("learning {} ...".format(question))
-                envManager.process_env(data)
-                envManager.wrong_answer()
-                envManager.append_sample(False)
-                envManager.get_action(np.array(envManager.env[1]))
-            self.last_env = envManager
-            response = envManager.dqn2server_answer(data["data"])
+            manager = self.envManagers[question]
+            if self.last_env is not None:
+                self.last_env.learn(data, False)
+                manager.get_info_from_previous_env(self.last_env)
+            response = manager.get_action(data)
+            self.last_env = manager
             print("Answer to chose from", data["data"])
             print("Answer chose", data["data"][response])
             return response
@@ -135,5 +112,5 @@ class Player:
                 self.end = True
 
 
-p = Player()
+p = Phantom()
 p.run()

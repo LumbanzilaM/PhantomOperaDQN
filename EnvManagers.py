@@ -60,7 +60,7 @@ class AEnvManager(ABC):
                 self.reward = ((self.carlotta_pos[1] - self.carlotta_pos[0]) - (3 * (self.suspect_nbr[0] - self.suspect_nbr[1])))
         else:
             self.reward = data[0]
-            print("Last reward = ", self.reward)
+            # print("Last reward = ", self.reward)
 
     def count_suspect(self):
         ret = 0
@@ -69,7 +69,6 @@ class AEnvManager(ABC):
         self.suspect_nbr[1] = ret
 
     def reset(self):
-        print()
         self.carlotta_pos = [-1, -1]
         self.suspect_nbr = [8, 0]
         self.env = [[], []]
@@ -112,7 +111,7 @@ class CharacterEnvManager(AEnvManager):
             ret[self.env_size - 3] = env[u.GAME_STATE][u.SHADOW]
             ret[self.env_size - 2] = env[u.GAME_STATE][u.BLOCKED][0]
             ret[self.env_size - 1] = env[u.GAME_STATE][u.BLOCKED][1]
-            print("phantom is  = ", self.phantom_color)
+            # print("phantom is  = ", self.phantom_color)
             self.env[1] = ret
             self.calculate_reward(env[u.DATA])
         return ret
@@ -154,7 +153,7 @@ class PositionEnvManager(AEnvManager):
                 ret[(characters.index(val[u.COLOR]) * 5) + 2] = val[u.POSITION]
                 # Set the power value to int 0 = false, 1 = true
                 ret[(characters.index(val[u.COLOR]) * 5) + 3] = int(val[u.POWER])
-            print(u.GAME_STATE, env[u.GAME_STATE][u.SHADOW])
+            #print(u.GAME_STATE, env[u.GAME_STATE][u.SHADOW])
             if env[u.QUESTION] == u.POS_SELECT:
                 for val in env[u.DATA]:
                     ret[40 + val] = -2
@@ -164,9 +163,9 @@ class PositionEnvManager(AEnvManager):
             ret[self.env_size - 3] = env[u.GAME_STATE][u.SHADOW]
             ret[self.env_size - 2] = env[u.GAME_STATE][u.BLOCKED][0]
             ret[self.env_size - 1] = env[u.GAME_STATE][u.BLOCKED][1]
-            print("pos ret =", ret)
-            print("selected character =", characters[self.previous_env.answerIdx])
-            print("possible pos = ", env[u.DATA])
+            # print("pos ret =", ret)
+            # print("selected character =", characters[self.previous_env.answerIdx])
+            # print("possible pos = ", env[u.DATA])
             self.env[1] = ret
             self.calculate_reward(env[u.DATA])
         return ret
@@ -181,11 +180,11 @@ class PositionEnvManager(AEnvManager):
         self.dqnAgent.model.save("tmp_models/position_picker.h5")
 
     def dqn2server_answer(self, question):
-        i = 0
-        for val in question:
-            if val == self.answerIdx:
-                return i
-            i += 1
+            i = 0
+            for val in question:
+                if val == self.answerIdx:
+                    return i
+                i += 1
 
 
 class CharacterEnvManagerV2(AEnvManager):
@@ -214,7 +213,7 @@ class CharacterEnvManagerV2(AEnvManager):
             ret[self.env_size - 3] = env[u.GAME_STATE][u.SHADOW]
             ret[self.env_size - 2] = env[u.GAME_STATE][u.BLOCKED][0]
             ret[self.env_size - 1] = env[u.GAME_STATE][u.BLOCKED][1]
-            print("phantom is  = ", self.phantom_color)
+            #print("phantom is  = ", self.phantom_color)
             self.env[1] = ret
             self.calculate_reward(env[u.DATA])
         return ret
@@ -256,7 +255,7 @@ class PositionEnvManagerV2(AEnvManager):
         ret = [0] * self.env_size
         if env[u.QUESTION] == u.POS_SELECT or env[u.QUESTION] == u.RESET:
             self.set_env_info(env)
-            print(" previous answer idx=", characters[self.previous_env.answerIdx])
+            # print(" previous answer idx=", characters[self.previous_env.answerIdx])
             ret[characters.index(characters[self.previous_env.answerIdx]) * 5] = 1
             for val in env[u.GAME_STATE][u.CHARACTERS]:
                 # Set the is suspect value to int 0 = false, 1 = true
@@ -266,7 +265,7 @@ class PositionEnvManagerV2(AEnvManager):
                 ret[(characters.index(val[u.COLOR]) * 5) + 2] = val[u.POSITION]
                 # Set the power value to int 0 = false, 1 = true
                 ret[(characters.index(val[u.COLOR]) * 5) + 3] = int(val[u.POWER])
-            print(u.GAME_STATE, env[u.GAME_STATE][u.SHADOW])
+            #print(u.GAME_STATE, env[u.GAME_STATE][u.SHADOW])
             if env[u.QUESTION] == u.POS_SELECT:
                 for val in env[u.DATA]:
                     ret[40 + val] = -2
@@ -276,9 +275,9 @@ class PositionEnvManagerV2(AEnvManager):
             ret[self.env_size - 3] = env[u.GAME_STATE][u.SHADOW]
             ret[self.env_size - 2] = env[u.GAME_STATE][u.BLOCKED][0]
             ret[self.env_size - 1] = env[u.GAME_STATE][u.BLOCKED][1]
-            print("pos ret =", ret)
-            print("selected character =", characters[self.previous_env.answerIdx])
-            print("possible pos = ", env[u.DATA])
+            #print("pos ret =", ret)
+            #print("selected character =", characters[self.previous_env.answerIdx])
+            #print("possible pos = ", env[u.DATA])
             self.env[1] = ret
             self.calculate_reward(env[u.DATA])
         return ret

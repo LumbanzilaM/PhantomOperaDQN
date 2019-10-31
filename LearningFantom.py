@@ -7,7 +7,7 @@ import protocol
 import numpy as np
 import random
 from DQNAgents import DQNAgent
-import EnvManagers
+import EnvManager
 import utils as u
 from collections import namedtuple
 
@@ -48,8 +48,8 @@ class Player:
 
     def init_dictionnary(self):
 
-        dic = {u.CHAR_SELECT: EnvManagers.CharacterEnvManagerV2(),
-               u.POS_SELECT: EnvManagers.PositionEnvManagerV2()}
+        dic = {u.CHAR_SELECT: EnvManager.CharacterEnvManagerV2(),
+               u.POS_SELECT: EnvManager.PositionEnvManagerV2()}
         return dic
 
     def connect(self):
@@ -82,7 +82,7 @@ class Player:
         elif question == u.RESET:
             for key, envManager in self.envManagers.items():
                 envManager.process_env(data)
-                envManager.append_sample(True)
+                envManager._append_sample(True)
                 print("last carlotta position = ", envManager.carlotta_pos)
                 print("last suspect nbr = ", envManager.suspect_nbr)
                 # self.dqnAgent.replay(32)
@@ -95,14 +95,14 @@ class Player:
             envManager.previous_env = self.last_env
             envManager.process_env(data)
             if not envManager.isFirstAction:
-                envManager.append_sample(False)
+                envManager._append_sample(False)
                 envManager.dqnAgent.train_model()
                 print("carlotta position = ", envManager.carlotta_pos)
                 print("suspect nbr = ", envManager.suspect_nbr)
                 print("reward = ", envManager.reward)
             envManager.get_action(np.array(envManager.env[1]))
             self.last_env = envManager
-            response = envManager.dqn2server_answer(data["data"])
+            response = envManager._dqn2server_answer(data["data"])
             print("Answer to chose from", data["data"])
             print("Answer chose", data["data"][response])
             return response

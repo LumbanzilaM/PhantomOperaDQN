@@ -7,7 +7,7 @@ import protocol
 import numpy as np
 import random
 from DQNAgents import DQNAgent
-import EnvManagers
+import EnvManager
 import utils as u
 from collections import namedtuple
 
@@ -48,8 +48,8 @@ class Player:
 
     def init_dictionnary(self):
 
-        dic = {u.CHAR_SELECT: EnvManagers.CharacterEnvManager(),
-               u.POS_SELECT: EnvManagers.PositionEnvManager()}
+        dic = {u.CHAR_SELECT: EnvManager.CharacterEnvManager(),
+               u.POS_SELECT: EnvManager.PositionEnvManager()}
         dic[u.CHAR_SELECT].dqnAgent.load_model("tmp_models/character_picker.h5")
         dic[u.POS_SELECT].dqnAgent.load_model("tmp_models/position_picker.h5")
         return dic
@@ -91,7 +91,7 @@ class Player:
             envManager.previous_env = self.last_env
             envManager.process_env(data)
             if not envManager.isFirstAction:
-                envManager.append_sample(self.end)
+                envManager._append_sample(self.end)
                 envManager.dqnAgent.train_model()
                 print("carlotta position = ", envManager.carlotta_pos)
                 print("suspect nbr = ", envManager.suspect_nbr)
@@ -99,8 +99,8 @@ class Player:
             envManager.get_action(np.array(envManager.env[1]), True)
 
             self.last_env = envManager
-            response = envManager.dqn2server_answer(data["data"])
-            if not envManager.validate_answer():
+            response = envManager._dqn2server_answer(data["data"])
+            if not envManager._validate_answer():
                 print("EPIC FAIL")
                 response = 0
             print("response = ", response)
