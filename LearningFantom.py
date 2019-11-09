@@ -74,21 +74,21 @@ class Player:
 
     def smart_answer(self, data):
         question = data[u.QUESTION]
-        print("question = ", question)
+        #print("question = ", question)
         if question != u.CHAR_SELECT and question != u.POS_SELECT and question != u.RESET:
-            print("Answer to chose from", data["data"])
-            print("Answer chose", data["data"][0])
+            #print("Answer to chose from", data["data"])
+            #print("Answer chose", data["data"][0])
             return 1
         elif question == u.RESET:
             for key, envManager in self.envManagers.items():
                 envManager.process_env(data)
                 envManager._append_sample(True)
-                print("last carlotta position = ", envManager.carlotta_pos)
-                print("last suspect nbr = ", envManager.suspect_nbr)
+                #print("last carlotta position = ", envManager.carlotta_pos)
+                #print("last suspect nbr = ", envManager.suspect_nbr)
                 # self.dqnAgent.replay(32)
                 envManager.reset()
                 envManager.dqnAgent.update_greedy()
-            print("RESET ------------------------------------------------------------------------------ RESET")
+            #print("RESET ------------------------------------------------------------------------------ RESET")
             return 0
         else:
             envManager = self.envManagers[question]
@@ -97,14 +97,14 @@ class Player:
             if not envManager.isFirstAction:
                 envManager._append_sample(False)
                 envManager.dqnAgent.train_model()
-                print("carlotta position = ", envManager.carlotta_pos)
-                print("suspect nbr = ", envManager.suspect_nbr)
-                print("reward = ", envManager.reward)
+                #print("carlotta position = ", envManager.carlotta_pos)
+                #print("suspect nbr = ", envManager.suspect_nbr)
+                #print("reward = ", envManager.reward)
             envManager.get_action(np.array(envManager.env[1]))
             self.last_env = envManager
             response = envManager._dqn2server_answer(data["data"])
-            print("Answer to chose from", data["data"])
-            print("Answer chose", data["data"][response])
+            #print("Answer to chose from", data["data"])
+            #print("Answer chose", data["data"][response])
             return response
 
     def handle_json(self, data):
@@ -123,7 +123,7 @@ class Player:
             if received_message:
                 self.handle_json(received_message)
             else:
-                print("no message, finished learning")
+                #print("no message, finished learning")
                 for key, envManager in self.envManagers.items():
                     envManager.save_training()
                 self.end = True

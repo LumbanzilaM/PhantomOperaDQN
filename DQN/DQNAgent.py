@@ -19,8 +19,8 @@ class DQNAgent:
         self.learning_rate = 0.001
         self.epsilon = 1.0
         self.epsilon_decay = 0.999
-        self.epsilon_min = 0.01
-        self.batch_size = 64
+        self.epsilon_min = 0.001
+        self.batch_size = 32
         self.train_start = 32
         self.round_count = 0
         self.total_round = 1000
@@ -55,19 +55,20 @@ class DQNAgent:
     # get action from model using epsilon-greedy policy
     def get_action(self, state):
         if np.random.rand() <= self.epsilon:
-            print("random answer")
-            return random.randrange(self.action_size)
+            q_value = np.random.randint(1, 101, self.action_size)
+            print("random answer -> epsilon {}".format(self.epsilon))
+            return q_value
         else:
             q_value = self.model.predict(np.reshape(state, (1, self.state_size)))
-            print("qvalues =", q_value)
-            print("smart answer")
-            return np.argmax(q_value[0])
+            #print("qvalues =", q_value)
+            print("smart answer -> epsilon {}".format(self.epsilon))
+            return q_value[0]
 
         # save sample <s,a,r,s'> to the replay memory
 
     def get_smart_action(self, state):
         q_value = self.model.predict(np.reshape(state, (1, self.state_size)))
-        return np.argmax(q_value[0])
+        return q_value[0]
 
     def load_model(self, path):
         self.model = load_model(path)
@@ -108,8 +109,8 @@ class DQNAgent:
 
     def update_greedy(self):
         self.round_count += 1
-        print("epsilon is now = ", self.epsilon)
+        #print("epsilon is now = ", self.epsilon)
         #print("ROUND --------> {}/{} ".format(self.round_count, self.total_round))
-        if self.epsilon > self.epsilon_min and len(self.memory) > 500:
+        if self.epsilon > self.epsilon_min and len(self.memory) > 31:
             if self.round_count % (self.total_round / 10) == 0:
-                self.epsilon -= 0.1
+                self.epsilon = self.epsilon -0.09

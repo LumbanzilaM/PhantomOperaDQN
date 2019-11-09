@@ -74,10 +74,10 @@ class Player:
 
     def smart_answer(self, data):
         question = data[u.QUESTION]
-        print("question = ", question)
+        #print("question = ", question)
         if question != u.CHAR_SELECT and question != u.POS_SELECT and question != u.RESET:
-            print("Answer to chose from", data["data"])
-            print("Answer chose", data["data"][0])
+            #print("Answer to chose from", data["data"])
+            #print("Answer chose", data["data"][0])
             return 0
         elif question == u.RESET:
             for key, envManager in self.envManagers.items():
@@ -88,7 +88,7 @@ class Player:
                 # self.dqnAgent.replay(32)
                 envManager.reset()
                 envManager.dqnAgent.update_greedy()
-            print("RESET ------------------------------------------------------------------------------ RESET")
+            #print("RESET ------------------------------------------------------------------------------ RESET")
             return 0
         else:
             envManager = self.envManagers[question]

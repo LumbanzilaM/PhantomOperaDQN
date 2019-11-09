@@ -29,6 +29,8 @@ PURPLE_POWER_USE = "purple character power"
 
 RED_POWER_ACTIVATE = "activate red power"
 
+POWER_ACTIVATE = "activate"
+
 # end Region Powers
 
 # region Environment
@@ -47,8 +49,10 @@ POWER = "power"
 FANTOM = "fantom"
 SHADOW = "shadow"
 BLOCKED = "blocked"
+END_PHASE = "end phase"
 
 # end region Environment
 
 characters = ['pink', 'blue', 'brown', 'red', 'black', 'white', 'purple', 'grey']
+passages = [{0, 1}, {0, 4}, {1, 2}, {2, 3}, {3, 7}, {4, 5}, {4, 8}, {4, 5}, {5, 6}, {6, 7}, {7, 9}, {8, 9}]
 

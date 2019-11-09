@@ -168,6 +168,15 @@ class Player:
                             after | two,
                             game.update_game_state(self.role))
 
+        self.end_phase(game.update_game_state(self.role))
+
+    def end_phase(self, game_state):
+        question = {"question type": "end phase",
+                    "data": [0, 0],
+                    "game state": game_state}
+        ask_question_json(self, question)
+
+
     def select(self, t, game_state):
         """
             Choose the character to activate whithin
@@ -615,13 +624,13 @@ pr = cProfile.Profile()
 pr.enable()
 
 stat = [0, 0]
-last_stat = [0 , 0]
+last_stat = [0, 0]
 
 for i in range(1000):
     game = Game(players)
     game.lancer()
     stat[game.winner] += 1
-    if i > 900:
+    if i > 0:
         last_stat[game.winner] += 1
     print("i =", i)
 

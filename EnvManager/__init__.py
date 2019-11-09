@@ -1,1 +1,3 @@
 from EnvManager.AEnvManager import AEnvManager
+from EnvManager.AInspectorEnvManager import AInspectorEnvManager
+from EnvManager.PowerActivationEnvManager import PowerActivationEnvManager

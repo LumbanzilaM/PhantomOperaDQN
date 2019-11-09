@@ -1,2 +1,5 @@
 from EnvManager.Phantom.CharacterEnvManager import CharacterEnvManager
 from EnvManager.Phantom.PositionEnvManager import PositionEnvManager
+from EnvManager.Phantom.GreyPowerEnvManager import GreyEnvManager
+from EnvManager.Phantom.PurplePowerEnvManager import PurplePowerEnvManager
+from EnvManager.Phantom.WhitePowerEnvManager import WhiteEnvManager

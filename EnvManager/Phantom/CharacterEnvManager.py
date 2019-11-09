@@ -4,8 +4,8 @@ import utils as u
 
 
 class CharacterEnvManager(AEnvManager):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, is_smart=False):
+        super().__init__(is_smart)
 
     def _set_model_name(self):
         return "char_picker.h5"
@@ -32,3 +32,13 @@ class CharacterEnvManager(AEnvManager):
 
     def get_info_from_previous_env(self, previous_env):
         pass
+
+    def learn(self, env, is_end):
+        if not self.smart:
+            self._set_ending_env(env)
+            self._append_sample(is_end)
+            self.dqnAgent.train_model()
+            print("Char first env ", self.env[0])
+            print("Char last env ", self.env[1])
+            print("suspects ", self.suspect_nbr)
+            print("Char reward ", self.reward)

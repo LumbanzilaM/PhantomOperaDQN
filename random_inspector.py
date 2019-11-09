@@ -76,7 +76,7 @@ class Player():
             if received_message:
                 self.handle_json(received_message)
             else:
-                print("no message, finished learning")
+                #print("no message, finished learning")
                 self.end = True
 
 
