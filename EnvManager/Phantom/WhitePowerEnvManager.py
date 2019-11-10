@@ -50,3 +50,13 @@ class WhiteEnvManager(AEnvManager):
             self.reward = 50 + (50 * (self.suspect_nbr[1] - self.suspect_nbr[0]))
         else:
             self.reward = -(12.25 * (self.suspect_nbr[0] - self.suspect_nbr[1]))
+
+    def learn(self, env, is_end):
+        if not self.smart:
+            self._set_ending_env(env)
+            self._append_sample(is_end)
+            self.dqnAgent.train_model()
+            print("White Power first env ", self.env[0])
+            print("White Power last env ", self.env[1])
+            print("suspects ", self.suspect_nbr)
+            print("White Power reward ", self.reward)

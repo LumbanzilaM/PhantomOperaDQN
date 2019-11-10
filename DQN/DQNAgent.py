@@ -20,12 +20,12 @@ class DQNAgent:
         self.epsilon = 1.0
         self.epsilon_decay = 0.999
         self.epsilon_min = 0.001
-        self.batch_size = 32
+        self.batch_size = 64
         self.train_start = 32
         self.round_count = 0
-        self.total_round = 1000
+        self.total_round = 100
         # create replay memory using deque
-        self.memory = collections.deque(maxlen=2000)
+        self.memory = collections.deque(maxlen=100000)
 
         # create main model and target model
         self.model = self.build_model()
@@ -38,9 +38,9 @@ class DQNAgent:
     # state is input and Q Value of each action is output of network
     def build_model(self):
         model = Sequential()
-        model.add(Dense(24, input_dim=self.state_size, activation='relu',
+        model.add(Dense(32, input_dim=self.state_size, activation='relu',
                         kernel_initializer='he_uniform'))
-        model.add(Dense(24, activation='relu',
+        model.add(Dense(32, activation='relu',
                         kernel_initializer='he_uniform'))
         model.add(Dense(self.action_size, activation='linear',
                         kernel_initializer='he_uniform'))
@@ -109,8 +109,8 @@ class DQNAgent:
 
     def update_greedy(self):
         self.round_count += 1
-        #print("epsilon is now = ", self.epsilon)
-        #print("ROUND --------> {}/{} ".format(self.round_count, self.total_round))
+        # print("epsilon is now = ", self.epsilon)
+        # print("ROUND --------> {}/{} ".format(self.round_count, self.total_round))
         if self.epsilon > self.epsilon_min and len(self.memory) > 31:
-            if self.round_count % (self.total_round / 10) == 0:
-                self.epsilon = self.epsilon -0.09
+            if self.round_count % (self.total_round / 20) == 0:
+                self.epsilon = self.epsilon -0.049

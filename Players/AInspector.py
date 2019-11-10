@@ -40,6 +40,7 @@ class Phantom:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.selected_char = 0
+        self.selected_char_moved = False
         self.answerIdx = 0
         self.gameIteration = 0
         self.envManagers = self.init_dictionnary()
@@ -49,10 +50,10 @@ class Phantom:
     def init_dictionnary(self):
 
         dic = {u.CHAR_SELECT: phantomManager.CharacterEnvManager(is_smart=True),
-               u.POWER_ACTIVATE: globalEnvManager.PowerActivationEnvManager(is_smart=True),
-               u.GREY_POWER_USE: phantomManager.GreyEnvManager(is_smart=True),
-               u.PURPLE_POWER_USE: phantomManager.PurplePowerEnvManager(is_smart=True),
-               u.WHITE_POWER_USE: phantomManager.WhiteEnvManager(is_smart=True),
+               # u.POWER_ACTIVATE: globalEnvManager.PowerActivationEnvManager(is_smart=True),
+               # u.GREY_POWER_USE: phantomManager.GreyEnvManager(is_smart=True),
+               # u.PURPLE_POWER_USE: phantomManager.PurplePowerEnvManager(is_smart=True),
+               # u.WHITE_POWER_USE: phantomManager.WhiteEnvManager(is_smart=True),
                u.POS_SELECT: phantomManager.PositionEnvManager(is_smart=True)}
         return dic
 
@@ -75,20 +76,25 @@ class Phantom:
         elif question == u.END_PHASE:
             if self.last_env is not None:
                 self.last_env.learn(data, False)
-            self.envManagers[u.CHAR_SELECT].learn(data, False)
-            self.envManagers[u.POWER_ACTIVATE].learn(data, False)
+            # self.envManagers[u.POWER_ACTIVATE].learn(data, False)
             self.last_env = None
         elif question == u.CHAR_SELECT:
             manager = self.envManagers[question]
+            if manager.num_phase >= 0:
+                manager.learn(data, False)
             response = manager.get_action(data)
             self.selected_char = data[u.DATA][response][u.COLOR]
+            self.selected_char_moved = False
         elif "activate" in question:
             # manager = self.envManagers[u.POWER_ACTIVATE]
-            # if self.last_env is not None and self.last_env is not self.envManagers[u.CHAR_SELECT]:
+            # if self.last_env is not None:
             #     self.last_env.learn(data, False)
             # manager.selected_character = self.selected_char
+            # manager.selected_char_moved = self.selected_char_moved
             # response = manager.get_action(data)
-            return 1
+            if self.last_env is not None:
+                self.last_env.learn(data, False)
+            return 0
         elif question not in self.envManagers:
             if self.last_env is not None:
                 self.last_env.learn(data, False)
@@ -98,6 +104,8 @@ class Phantom:
             manager = self.envManagers[question]
             if self.last_env is not None:
                 self.last_env.learn(data, False)
+            if question == u.POS_SELECT:
+                self.selected_char_moved = True
             manager.selected_character = self.selected_char
             response = manager.get_action(data)
             self.last_env = manager
@@ -115,11 +123,15 @@ class Phantom:
 
     def select_fantom(self, env):
         potential = []
+        print("Random fantom is {}".format(u.characters[self.fantom_idx]))
+        print(env)
         if not env[u.GAME_STATE][u.CHARACTERS][self.fantom_idx][u.SUSPECT]:
             for val in env[u.GAME_STATE][u.CHARACTERS]:
                 if val[u.SUSPECT]:
                     potential.append(val)
             fantom_idx = random.randint(0, len(potential)-1)
+            print(env)
+            print("New fantom is {}".format(u.characters[self.fantom_idx]))
             for key, envManager in self.envManagers.items():
                 envManager.phantom_position = potential[fantom_idx][u.POSITION]
                 envManager.phantom_color = potential[fantom_idx][u.COLOR]

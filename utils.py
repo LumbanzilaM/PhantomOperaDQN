@@ -50,7 +50,7 @@ FANTOM = "fantom"
 SHADOW = "shadow"
 BLOCKED = "blocked"
 END_PHASE = "end phase"
-
+NUM_TOUR = "num_tour"
 # end region Environment
 
 characters = ['pink', 'blue', 'brown', 'red', 'black', 'white', 'purple', 'grey']

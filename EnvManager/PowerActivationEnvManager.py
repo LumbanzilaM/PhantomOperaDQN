@@ -7,6 +7,7 @@ class PowerActivationEnvManager(AEnvManager):
     def __init__(self, is_smart=False):
         super().__init__(is_smart)
         self.isActivated = False
+        self.selected_char_moved = False
 
     def _set_model_name(self):
         return "power_activation_picker.h5"
@@ -22,10 +23,11 @@ class PowerActivationEnvManager(AEnvManager):
             i += 1
 
     def _set_model_scope(self):
-        return 43, 2
+        return 44, 2
 
     def _format_env2dqn(self, env):
         ret = super()._format_env2dqn(env)
+        ret[self.env_size - 4] = int(self.selected_char_moved)
         print("Selected char =", self.selected_character)
         ret[u.characters.index(self.selected_character) * 5] = 1
         return ret
@@ -45,7 +47,8 @@ class PowerActivationEnvManager(AEnvManager):
             self.isActivated = False
 
     def _get_smart_action(self, env):
-        if u.RED_POWER_ACTIVATE == env[u.QUESTION]:
+        if u.RED_POWER_ACTIVATE == env[u.QUESTION] or u.PURPLE_POWER_ACTIVATE == env[u.QUESTION]:
+            self.answerIdx = 1
             return 1
         self._set_starting_env(env)
         values = np.array(self.dqnAgent.get_smart_action(self.env[0]))

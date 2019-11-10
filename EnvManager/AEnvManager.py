@@ -138,6 +138,7 @@ class AEnvManager(ABC):
             self._append_sample(False)
             self.dqnAgent.train_model()
             print("Manager {} learning wih actual values {}".format(self.model_name, values))
+            print("With actual state {} ".format(env))
         print("Learning state ->", values)
         return self._dqn2server_answer(env[u.ANSWER])
 

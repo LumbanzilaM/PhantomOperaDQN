@@ -10,7 +10,7 @@ class BlueEnvManager(AInspectorEnvManager):
             print("wow")
 
     def _set_model_name(self):
-        return "inspector_grey_power.h5"
+        return "grey_power.h5"
 
     def _validate_answer(self, answers):
         return True

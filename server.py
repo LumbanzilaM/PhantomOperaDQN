@@ -626,11 +626,11 @@ pr.enable()
 stat = [0, 0]
 last_stat = [0, 0]
 
-for i in range(1000):
+for i in range(100):
     game = Game(players)
     game.lancer()
     stat[game.winner] += 1
-    if i > 0:
+    if i > 9000:
         last_stat[game.winner] += 1
     print("i =", i)
 

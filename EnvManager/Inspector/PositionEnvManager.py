@@ -9,7 +9,7 @@ class PositionEnvManager(AInspectorEnvManager):
         self.save_pos = [0] * 10
 
     def _set_model_name(self):
-        return "inspector_pos_picker2.h5"
+        return "i_pos_picker2.h5"
 
     def _validate_answer(self, answers):
         return self.answerIdx in answers
@@ -34,4 +34,15 @@ class PositionEnvManager(AInspectorEnvManager):
 
     def get_info_from_previous_env(self, previous_env):
         self.selected_character = previous_env.selected_character
+
+    def learn(self, env, is_end):
+        if not self.smart:
+            self._set_ending_env(env)
+            self._append_sample(is_end)
+            self.dqnAgent.train_model()
+            print("Pos first env ", self.env[0])
+            print("Pos last env ", self.env[1])
+            print("suspects ", self.suspect_nbr)
+            print("Pos reward ", self.reward)
+
 

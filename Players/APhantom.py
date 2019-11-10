@@ -40,6 +40,7 @@ class Phantom:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.selected_char = 0
+        self.selected_char_moved = False
         self.answerIdx = 0
         self.gameIteration = 0
         self.envManagers = self.init_dictionnary()
@@ -88,20 +89,22 @@ class Phantom:
         elif question == u.END_PHASE:
             if self.last_env is not None:
                 self.last_env.learn(data, False)
-            self.envManagers[u.CHAR_SELECT].learn(data, False)
             self.envManagers[u.POWER_ACTIVATE].learn(data, False)
             self.last_env = None
         elif question == u.CHAR_SELECT:
             manager = self.envManagers[question]
+            if manager.num_phase >= 0:
+                manager.learn(data, False)
             response = manager.get_action(data)
             self.selected_char = data[u.DATA][response][u.COLOR]
+            self.selected_char_moved = False
         elif "activate" in question:
-            # manager = self.envManagers[u.POWER_ACTIVATE]
-            # if self.last_env is not None and self.last_env is not self.envManagers[u.CHAR_SELECT]:
-            #     self.last_env.learn(data, False)
-            # manager.selected_character = self.selected_char
-            # response = manager.get_action(data)
-            return 1
+            manager = self.envManagers[u.POWER_ACTIVATE]
+            if self.last_env is not None:
+                self.last_env.learn(data, False)
+            manager.selected_character = self.selected_char
+            manager.selected_char_moved = self.selected_char_moved
+            response = manager.get_action(data)
         elif question not in self.envManagers:
             if self.last_env is not None:
                 self.last_env.learn(data, False)
@@ -111,6 +114,8 @@ class Phantom:
             manager = self.envManagers[question]
             if self.last_env is not None:
                 self.last_env.learn(data, False)
+            if question == u.POS_SELECT:
+                self.selected_char_moved = True
             manager.selected_character = self.selected_char
             response = manager.get_action(data)
             self.last_env = manager
